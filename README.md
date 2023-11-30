@@ -2,13 +2,14 @@
 Author:     Ville Koch (@vegvisir87, https://github.com/ville87)   
 Version:    v1.0 (30.11.2023)   
 
-This script was made for testing purposes in an Active Directory domain.    
-It is not advised to use this in a production environment!   
+> [!WARNING]  
+> This script was made for testing purposes in an Active Directory domain.    
+> It is not advised to use this in a production environment!   
 
 This script uses x509 certificate based authentication against LDAP to create a user or take an existing user and if specified add it as a member to a specified group. 
 - The user will be enabled after creation (userAccountControl=512). 
-- The users distinguishedName will be built from the given domain name, like: CN=Username,CN=Users,DC=lab,DC=local.
-- When looking for users or group, the Base DN is currently always the container CN=Users,DC=lab,DC=local.
+- The users distinguishedName will be built from the given domain name, like: `CN=Username,CN=Users,DC=lab,DC=local.`
+- When looking for users or group, the Base DN is currently always the container *CN=Users,DC=lab,DC=local*.
    
 The certificate based authentication and LDAP_SERVER_WHO_AM_I request were taken from:   
 https://raw.githubusercontent.com/leechristensen/Random/master/PowerShellScripts/Get-LdapCurrentUser.ps1
