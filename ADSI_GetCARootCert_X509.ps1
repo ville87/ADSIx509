@@ -84,16 +84,14 @@ Process {
                 $X509CertificateCollection = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2Collection
                 $X509CertificateCollection.Import($DERCert, $null, [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::EphemeralKeySet)
                 Write-Output "##############   Found cert:   ################`r`n $X509CertificateCollection"
+                foreach ($certCollection in $X509CertificateCollection) {
+                    $cerFilePath = Join-Path $CertExportPath "$($certCollection.Thumbprint).cer"
+                    $cerBytes = $certCollection.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Cert)
+                    [System.IO.File]::WriteAllBytes($cerFilePath, $cerBytes)
+                    Write-Output "CER file created here: $cerFilePath"
+                }
             }
         }
-
-        foreach ($certCollection in $X509CertificateCollection) {
-            $cerFilePath = Join-Path $CertExportPath "$($certCollection.Thumbprint).cer"
-            $cerBytes = $certCollection.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Cert)
-            [System.IO.File]::WriteAllBytes($cerFilePath, $cerBytes)
-            Write-Output "CER file created here: $cerFilePath"
-        }
-
     } catch {
         printInfo -info "There was an error when running the script. Error:`r`n$_" -level "ERROR"
     }
