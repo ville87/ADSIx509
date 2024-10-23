@@ -17,13 +17,12 @@
 
     File-Name:  ADSI_AddUser_X509.ps1
     Author:     Ville Koch (@vegvisir87, https://github.com/ville87)
-    Version:    v1.0 (30.11.2023)
+    Version:    v1.2 (23/10/2024)
 
     TODO:
     - Figure out how System.DirectoryServices.Protocols.SearchRequest has to be set to look in any container / subcontainers / OUs, not just CN=users...
     - Add more error handling
     - Add verbose logging possibility
-    - Add possibility to skip user creation and only add user to group
 
 .LINK
     https://github.com/ville87/ADSIx509
@@ -200,6 +199,26 @@ Process {
             }else{
                 printInfo -info "User was created." -level "INFO"
             }
+            ###################### Set password #######################
+            # TODO: Add error handling
+            $newPassword = Read-Host "Please define a password for the new account. Make sure it is according to the pw policy!" -AsSecureString
+            $modifyOperation = New-Object System.DirectoryServices.Protocols.DirectoryAttributeModification
+            $modifyOperation.Operation = [System.DirectoryServices.Protocols.DirectoryAttributeOperation]::Replace
+            $modifyOperation.Name = "unicodePwd"
+            $modifyOperation.Add([Text.Encoding]::Unicode.GetBytes(('"{0}"' -f [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($newPassword)))))
+            $modifyRequest = New-Object System.DirectoryServices.Protocols.ModifyRequest $userDN, $modifyOperation
+            $modifyResponse = $c.SendRequest($modifyRequest)
+            printInfo -info "Password was set for the user." -level "INFO"
+
+            ###################### Enable account ####################### 
+            # TODO: Add error handling
+            $modifyOperation = New-Object System.DirectoryServices.Protocols.DirectoryAttributeModification
+            $modifyOperation.Operation = [System.DirectoryServices.Protocols.DirectoryAttributeOperation]::Replace
+            $modifyOperation.Name = "userAccountControl"
+            $modifyOperation.Add("512")
+            $modifyRequest = New-Object System.DirectoryServices.Protocols.ModifyRequest $userDN, $modifyOperation
+            $modifyResponse = $c.SendRequest($modifyRequest)
+            printInfo -info "Enabled the account." -level "INFO"
         }else{
             printInfo -info "It was chosen to not create a user, checking if it can be found in AD..." -level "INFO"
             $Request = New-Object System.DirectoryServices.Protocols.SearchRequest
@@ -218,26 +237,6 @@ Process {
             }
         }
 
-        ###################### Set password #######################
-        # TODO: Add error handling
-        $newPassword = Read-Host "Please define a password for the new account. Make sure it is according to the pw policy!" -AsSecureString
-        $modifyOperation = New-Object System.DirectoryServices.Protocols.DirectoryAttributeModification
-        $modifyOperation.Operation = [System.DirectoryServices.Protocols.DirectoryAttributeOperation]::Replace
-        $modifyOperation.Name = "unicodePwd"
-        $modifyOperation.Add([Text.Encoding]::Unicode.GetBytes(('"{0}"' -f [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($newPassword)))))
-        $modifyRequest = New-Object System.DirectoryServices.Protocols.ModifyRequest $userDN, $modifyOperation
-        $modifyResponse = $c.SendRequest($modifyRequest)
-        printInfo -info "Password was set for the user." -level "INFO"
-
-        ###################### Enable account ####################### 
-        # TODO: Add error handling
-        $modifyOperation = New-Object System.DirectoryServices.Protocols.DirectoryAttributeModification
-        $modifyOperation.Operation = [System.DirectoryServices.Protocols.DirectoryAttributeOperation]::Replace
-        $modifyOperation.Name = "userAccountControl"
-        $modifyOperation.Add("512")
-        $modifyRequest = New-Object System.DirectoryServices.Protocols.ModifyRequest $userDN, $modifyOperation
-        $modifyResponse = $c.SendRequest($modifyRequest)
-        printInfo -info "Enabled the account." -level "INFO"
 
         if($AddToGroup -eq "Y"){
             ###################### Add to group #######################

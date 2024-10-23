@@ -1,6 +1,6 @@
 # ADSIx509
 Author:     Ville Koch (@vegvisir87, https://github.com/ville87)   
-Version:    v1.1 (06.12.2023)   
+Version:    v1.2 (23/10/2024)   
 
 > [!WARNING]  
 > These scripts were made for testing purposes in an Active Directory domain.    
