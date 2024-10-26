@@ -23,7 +23,7 @@ TODO:
 ### Examples 
 Create a new user and add it to the Domain Admins group:   
 ```powershell
-.\ADSI_AddUser_X509.ps1 -CertPath C:\TEMP\domadmin.pfx -domain lab.local -DCIP 10.0.0.4 -CreateUser Y -samAccountName baduser1 -givenName Hans -sn Landa -AddToGroup Y -groupName "Domain Admins"
+.\ADSI_AddUser_X509.ps1 -CertPath "C:\TEMP\domadmin.pfx" -domain lab.local -DCIP 10.0.0.4 -CreateUser Y -samAccountName baduser1 -givenName Hans -sn Landa -AddToGroup Y -groupName "Domain Admins"
 ```
 
 Take an existing user and add it to the Domain Admins group:   
@@ -34,6 +34,16 @@ Take an existing user and add it to the Domain Admins group:
 Only create a new user:   
 ```powershell
 .\ADSI_AddUser_X509.ps1 -CertPath C:\TEMP\domadmin.pfx -domain lab.local -DCIP 10.0.0.4 -CreateUser Y -samAccountName anotheruser1 -givenName Mister -sn Blonde -AddToGroup N
+```
+
+## ADSI_ReadLDAP_X509.ps1
+The script uses x509 certificate based authentication against LDAP to read LDAP properties.
+Note: Some properties are not returned in human readable format. This is still work in progress...
+
+### Examples
+List properties of enabled computers in specific OU:    
+```powershell
+.\ADSI_ReadLDAP_X509.ps1 -CertPath "C:\Users\jdoe\Desktop\rplant.pfx" -domain lab.local -DCIP 10.0.0.4 -LDAPFilter "(&(objectCategory=computer)(!(userAccountControl:1.2.840.113556.1.4.803:=2))((ms-mcs-admpwdexpirationtime=*)))" -DistinguishedName "OU=Workstations,DC=lab,DC=local"
 ```
 
 ## ADSI_GetCARootCert_X509.ps1
