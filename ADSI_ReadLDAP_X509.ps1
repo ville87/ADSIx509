@@ -175,7 +175,10 @@ Process {
                     $valueStrings = @()
                     # TODO: This does not work yet, because returned values are all byte values and some are returned in an unreadable format...
                     foreach ($value in $attributeValues) {
-                        if ($value -is [byte[]]) {
+                        if($attributeName -eq "objectsid"){
+                            $objectsid = New-Object System.Security.Principal.SecurityIdentifier($value, 0)
+                            $decodedValue = $objectsid.Value
+                        }elseif ($value -is [byte[]]) {
                             $decodedValue = [System.Text.Encoding]::UTF8.GetString($value)
                         }elseif($attributeName -in $LIntUTCAttributes){
                             $decodedValue = convertLIntUTC -value $value
